@@ -1,0 +1,56 @@
+import processing.serial.*;
+
+Serial myPort;
+float[] distances = new float[181]; // Global değişken olarak tanımlandı
+
+void setup() {
+  size(800, 600);
+  String portName = "COM8"; // Doğru portu seçin
+  try {
+    myPort = new Serial(this, portName, 115200); // Baud hızını STM32 ile aynı yapın
+    myPort.bufferUntil('\n'); // Satır sonuna kadar veri oku
+    println("Port opened successfully: " + portName);
+  } catch (Exception e) {
+    println("Error opening port: " + e.getMessage());
+  }
+}
+
+void draw() {
+  background(0);
+  translate(width/2, height);
+
+  stroke(0, 255, 0);
+  noFill();
+  for (int i = 50; i <= 300; i += 50) {
+    ellipse(0, 0, 2*i, 2*i);
+  }
+
+  for (int i = 0; i <= 180; i += 30) {
+    float x = 300 * cos(radians(i));
+    float y = -300 * sin(radians(i));
+    line(0, 0, x, y);
+  }
+
+  for (int i = 0; i <= 180; i++) {
+    float x = distances[i] * cos(radians(i));
+    float y = -distances[i] * sin(radians(i));
+    stroke(0, 255, 0);
+    line(0, 0, x, y);
+  }
+}
+
+void serialEvent(Serial myPort) {
+  String data = myPort.readStringUntil('\n');
+  if (data != null) {
+    println("Received Data: " + data); // Gelen veriyi konsola yazdır
+    data = trim(data);
+    String[] values = split(data, ',');
+    if (values.length == 2) {
+      int angle = Integer.parseInt(values[0]);
+      float distance = Float.parseFloat(values[1]);
+      if (angle >= 0 && angle <= 180) {
+        distances[angle] = distance;
+      }
+    }
+  }
+}
