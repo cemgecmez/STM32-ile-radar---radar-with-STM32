@@ -1,1 +1,3 @@
 # STM32-ile-radar---radar-with-STM32
+
+kodları kopyala yapıştır yaptığınızda çalışacak şekilde yazdım...
